@@ -1,5 +1,4 @@
-import React from "react";
-import ReactDOM from "react-dom/client";
+
 import { Menubar } from "primereact/menubar";
 import { Button } from "primereact/button";
 
@@ -43,15 +42,14 @@ function NavMenu() {
     <Button
       label="Login"
       icon="pi pi-sign-in"
-      className="p-button-sm p-button-outlined"
-      onClick={() => alert("Login clicked")}
+      size="small"
+      outlined
+      onClick={() => "/Identity/Account/Manage"}
     />
   );
 
   return (
-    <div className="card">
-      <Menubar model={items} start={start} end={end} />
-    </div>
+    <Menubar model={items} start={start} end={end} />
   );
 }
 

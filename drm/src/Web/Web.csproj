@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <SpaRoot>ClientApp\</SpaRoot>
-    <SpaProxyServerUrl>https://localhost:44447</SpaProxyServerUrl>
+    <SpaProxyServerUrl>https://localhost:3000</SpaProxyServerUrl>
     <SpaProxyLaunchCommand>npm start</SpaProxyLaunchCommand>
     <RootNamespace>drm.Web</RootNamespace>
     <AssemblyName>drm.Web</AssemblyName>

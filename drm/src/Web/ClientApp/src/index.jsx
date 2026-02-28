@@ -1,14 +1,17 @@
-import 'bootstrap/dist/css/bootstrap.css';
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
-import App from './App';
+import App from './App.jsx';
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import reportWebVitals from './reportWebVitals';
-import 'primereact/resources/themes/saga-blue/theme.css';
-import 'primereact/resources/primereact.min.css';
-import 'primeicons/primeicons.css';
+
+// CSS imports - PrimeReact first for precedence
 import 'primeflex/primeflex.css';
+import "primereact/resources/themes/lara-light-blue/theme.css";
+import "primereact/resources/primereact.min.css";
+import "primeicons/primeicons.css";
+import 'bootstrap/dist/css/bootstrap.css';
+
 import { PrimeReactProvider } from 'primereact/api';
 
 const baseUrl = document.getElementsByTagName('base')[0].getAttribute('href');
