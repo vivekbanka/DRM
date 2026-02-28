@@ -1,50 +1,60 @@
-import React, { Component } from 'react';
-import { Collapse, Navbar, NavbarBrand, NavbarToggler, NavItem, NavLink } from 'reactstrap';
-import { Link } from 'react-router-dom';
-import './NavMenu.css';
+import React from "react";
+import ReactDOM from "react-dom/client";
+import { Menubar } from "primereact/menubar";
+import { Button } from "primereact/button";
 
-export class NavMenu extends Component {
-  static displayName = NavMenu.name;
+function NavMenu() {
+  // Menu items configuration
+  const items = [
+    {
+      label: "Home",
+      icon: "pi pi-home",
+      command: () => alert("Home clicked")
+    },
+    {
+      label: "Products",
+      icon: "pi pi-briefcase",
+      command: () => alert("Home clicked")
+    },
+    {
+      label: "About",
+      icon: "pi pi-info-circle",
+      command: () => alert("About clicked")
+    },
+    {
+      label: "Contact",
+      icon: "pi pi-envelope",
+      command: () => alert("Contact clicked")
+    }
+  ];
 
-  constructor (props) {
-    super(props);
+  // Custom start content (logo or brand name)
+  const start = (
+    <img
+      alt="logo"
+      src="/assets/VcareLog.webp"
+      height="40"
+      className="mr-2"
+    />
+  );
 
-    this.toggleNavbar = this.toggleNavbar.bind(this);
-    this.state = {
-      collapsed: true
-    };
-  }
+  // Custom end content (login button)
+  const end = (
+    <Button
+      label="Login"
+      icon="pi pi-sign-in"
+      className="p-button-sm p-button-outlined"
+      onClick={() => alert("Login clicked")}
+    />
+  );
 
-  toggleNavbar () {
-    this.setState({
-      collapsed: !this.state.collapsed
-    });
-  }
-
-  render() {
-    return (
-      <header>
-        <Navbar className="navbar-expand-sm navbar-toggleable-sm ng-white border-bottom box-shadow mb-3" container light>
-          <NavbarBrand tag={Link} to="/">drm.Web</NavbarBrand>
-          <NavbarToggler onClick={this.toggleNavbar} className="mr-2" />
-          <Collapse className="d-sm-inline-flex flex-sm-row-reverse" isOpen={!this.state.collapsed} navbar>
-            <ul className="navbar-nav flex-grow">
-              <NavItem>
-                <NavLink tag={Link} className="text-dark" to="/">Home</NavLink>
-              </NavItem>
-              <NavItem>
-                <NavLink tag={Link} className="text-dark" to="/counter">Counter</NavLink>
-              </NavItem>
-              <NavItem>
-                <NavLink tag={Link} className="text-dark" to="/fetch-data">Fetch data</NavLink>
-              </NavItem>
-              <NavItem>
-                <a className="nav-link text-dark" href="/Identity/Account/Manage">Account</a>
-              </NavItem>
-            </ul>
-          </Collapse>
-        </Navbar>
-      </header>
-    );
-  }
+  return (
+    <div className="card">
+      <Menubar model={items} start={start} end={end} />
+    </div>
+  );
 }
+
+export default NavMenu;
+
+

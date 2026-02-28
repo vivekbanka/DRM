@@ -67,6 +67,7 @@ public class ApplicationDbContextInitialiser
         }
     }
 
+
     public async Task TrySeedAsync()
     {
         // Default roles
