@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { Container } from 'primereact/container';
 import NavMenu from './NavMenu.jsx';
 
 export class Layout extends Component {
@@ -9,9 +8,9 @@ export class Layout extends Component {
     return (
       <div>
         <NavMenu />
-        <Container tag="main">
+        <div className="p-container p-fluid" style={{ padding: '2rem' }}>
           {this.props.children}
-        </Container>
+        </div>
       </div>
     );
   }

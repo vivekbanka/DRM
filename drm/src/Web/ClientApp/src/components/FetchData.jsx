@@ -1,4 +1,7 @@
 import React, { Component } from 'react';
+import { DataTable } from 'primereact/datatable';
+import { Column } from 'primereact/column';
+import { ProgressSpinner } from 'primereact/progressspinner';
 import followIfLoginRedirect from './api-authorization/followIfLoginRedirect';
 import { WeatherForecastsClient } from '../web-api-client.ts';
 
@@ -14,38 +17,21 @@ export class FetchData extends Component {
     this.populateWeatherData();
   }
 
-  static renderForecastsTable(forecasts) {
-    return (
-      <table className="table table-striped" aria-labelledby="tableLabel">
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Temp. (C)</th>
-            <th>Temp. (F)</th>
-            <th>Summary</th>
-          </tr>
-        </thead>
-        <tbody>
-          {forecasts.map(forecast =>
-            <tr key={forecast.date}>
-              <td>{new Date(forecast.date).toLocaleDateString()}</td>
-              <td>{forecast.temperatureC}</td>
-              <td>{forecast.temperatureF}</td>
-              <td>{forecast.summary}</td>
-            </tr>
-          )}
-        </tbody>
-      </table>
-    );
-  }
-
   render() {
     let contents = this.state.loading
-      ? <p><em>Loading...</em></p>
-      : FetchData.renderForecastsTable(this.state.forecasts);
+      ? <div className="p-d-flex p-jc-center"><ProgressSpinner /></div>
+      : (
+        <DataTable value={this.state.forecasts} className="p-datatable-sm">
+          <Column field="date" header="Date" body={(rowData) => new Date(rowData.date).toLocaleDateString()} />
+          <Column field="temperatureC" header="Temp. (C)" />
+          <Column field="temperatureF" header="Temp. (F)" />
+          <Column field="summary" header="Summary" />
+        </DataTable>
+      );
 
     return (
       <div>
+        <h3>Weather Forecast</h3>
         <p>This component demonstrates fetching data from the server.</p>
         {contents}
       </div>
@@ -55,13 +41,6 @@ export class FetchData extends Component {
   async populateWeatherData() {
     let client = new WeatherForecastsClient();
     const data = await client.getWeatherForecasts();
-    this.setState({ forecasts: data, loading: false });
-  }
-
-  async populateWeatherDataOld() {
-    const response = await fetch('weatherforecast');
-    followIfLoginRedirect(response);
-    const data = await response.json();
     this.setState({ forecasts: data, loading: false });
   }
 }
