@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { Container } from 'reactstrap';
-import  NavMenu  from './NavMenu.jsx';
+import { Container } from 'primereact/container';
+import NavMenu from './NavMenu.jsx';
 
 export class Layout extends Component {
   static displayName = Layout.name;

@@ -1,29 +1,32 @@
 
 import { Menubar } from "primereact/menubar";
 import { Button } from "primereact/button";
+import { useNavigate } from "react-router-dom";
 
 function NavMenu() {
+  const navigate = useNavigate();
+  
   // Menu items configuration
   const items = [
     {
       label: "Home",
       icon: "pi pi-home",
-      command: () => alert("Home clicked")
+      command: () => navigate("/")
     },
     {
       label: "Products",
       icon: "pi pi-briefcase",
-      command: () => alert("Home clicked")
+      command: () => navigate("/products")
     },
     {
       label: "About",
       icon: "pi pi-info-circle",
-      command: () => alert("About clicked")
+      command: () => navigate("/about")
     },
     {
       label: "Contact",
       icon: "pi pi-envelope",
-      command: () => alert("Contact clicked")
+      command: () => navigate("/contact")
     }
   ];
 
@@ -44,7 +47,7 @@ function NavMenu() {
       icon="pi pi-sign-in"
       size="small"
       outlined
-      onClick={() => "/Identity/Account/Manage"}
+      onClick={() => navigate("/Identity/Account/Manage")}
     />
   );
 

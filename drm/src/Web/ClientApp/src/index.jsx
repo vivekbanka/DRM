@@ -7,10 +7,9 @@ import reportWebVitals from './reportWebVitals';
 
 // CSS imports - PrimeReact first for precedence
 import 'primeflex/primeflex.css';
+import "primeicons/primeicons.css";
 import "primereact/resources/themes/lara-light-blue/theme.css";
 import "primereact/resources/primereact.min.css";
-import "primeicons/primeicons.css";
-import 'bootstrap/dist/css/bootstrap.css';
 
 import { PrimeReactProvider } from 'primereact/api';
 
