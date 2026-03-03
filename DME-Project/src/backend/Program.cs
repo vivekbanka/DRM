@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Serilog;
 using Prometheus;
+using Microsoft.OpenApi.Models;
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
@@ -17,6 +18,55 @@ var builder = WebApplication.CreateBuilder(args);
 // Services
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+
+// Swagger/OpenAPI configuration
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo 
+    { 
+        Title = "DRM API", 
+        Version = "v1",
+        Description = "API documentation for DRM application with scalar types",
+        Contact = new OpenApiContact
+        {
+            Name = "DRM Team",
+            Email = "support@drm.com"
+        }
+    });
+    
+    // Add JWT Authentication to Swagger
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
+    });
+    
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+    
+    // Include XML comments
+    var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    if (File.Exists(xmlPath))
+    {
+        c.IncludeXmlComments(xmlPath);
+    }
+});
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddHealthChecks()
@@ -73,6 +123,18 @@ app.UseAuthorization();
 app.UseMetricServer();  // /metrics
 app.UseHttpMetrics();
 app.MapHealthChecks("/health");
+
+// Swagger UI
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "DRM API V1");
+        c.RoutePrefix = "swagger";
+    });
+}
+
 app.MapControllers();
 
 // Seed data

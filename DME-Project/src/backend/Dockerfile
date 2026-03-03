@@ -1,6 +1,6 @@
 # Stage 1: Build
 
-FROM mcr.microsoft.com/dotnet/sdk:8.0-alpine AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0-alpine AS build
 WORKDIR /src
 
 # Install build dependencies
@@ -20,7 +20,7 @@ RUN dotnet publish -c Release --no-restore -o /app/publish \
 
 # Stage 2: Runtime
 
-FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine AS final
+FROM mcr.microsoft.com/dotnet/aspnet:10.0-alpine AS final
 
 # Create distinct non-root user
 RUN addgroup --gid 1001 -S backenduser && \
