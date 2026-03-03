@@ -11,11 +11,12 @@ public class AppDbContext : DbContext
     public DbSet<Role> Roles => Set<Role>();
     public DbSet<UserRole> UserRoles => Set<UserRole>();
 
+    public DbSet<Company> Companies => Set<Company>();
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
-        builder.Entity<Item>().HasData(
-            new Item { Id = 1, Name = "Initial Item", Value = 42 }
-        );
+        builder.Entity<Item>()
+            .HasKey(i => i.Id);
 
         // Configure User-Role many-to-many relationship
         builder.Entity<UserRole>()
@@ -31,10 +32,14 @@ public class AppDbContext : DbContext
             .WithMany(r => r.UserRoles)
             .HasForeignKey(ur => ur.RoleId);
 
+        builder.Entity<Company>().HasKey(c => c.Id);
+
+        builder.Entity<User>()
+            .HasOne<Company>()
+            .WithMany()
+            .HasForeignKey(u => u.CompanyId);
+
         // Seed default roles
-        builder.Entity<Role>().HasData(
-            new Role { Id = 1, Name = "Admin", Description = "System administrator", CreatedAt = DateTime.UtcNow },
-            new Role { Id = 2, Name = "User", Description = "Regular user", CreatedAt = DateTime.UtcNow }
-        );
+        builder.Entity<Role>().HasKey(r => r.Id);
     }
 }
