@@ -1,0 +1,37 @@
+# Development Dockerfile with hot-reload
+FROM mcr.microsoft.com/dotnet/sdk:10.0-alpine AS build
+
+WORKDIR /src/backend
+
+# Copy csproj and restore
+COPY src/backend/Backend.csproj ./
+RUN dotnet restore ./Backend.csproj
+
+# Copy source code and build
+COPY src/backend/ .
+RUN dotnet build -c Debug
+
+# Runtime stage
+FROM mcr.microsoft.com/dotnet/aspnet:10.0-alpine AS development
+
+# Install development dependencies
+RUN apk add --no-cache ca-certificates tzdata && update-ca-certificates
+
+WORKDIR /src/backend
+
+# Copy built application
+COPY --from=build /src/backend/bin/Debug/net10.0/linux-x64/ ./
+
+# Expose port for development
+EXPOSE 5000
+
+# Set environment for development
+ENV ASPNETCORE_ENVIRONMENT=Development
+ENV ASPNETCORE_URLS=http://+:5000
+
+# Health check for development
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD wget --no-verbose --tries=1 --spider http://localhost:5000/health || exit 1
+
+# Run the application
+ENTRYPOINT ["dotnet", "Backend.dll", "--urls", "http://0.0.0.0:5000"]

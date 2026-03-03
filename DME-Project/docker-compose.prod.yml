@@ -11,12 +11,10 @@ volumes:
   prometheus_data: {}
   grafana_data: {}
 
-# PostgreSQL
-
 services: 
   postgres:
     image: postgres:16-alpine
-    container_name: postgres
+    container_name: postgres-prod
     environment:
       POSTGRES_DB: appdb
       POSTGRES_USER: appuser
@@ -35,31 +33,26 @@ services:
       retries: 5
     restart: unless-stopped
 
-  # Backend API (Development)
+  # Backend API (Production)
   backend:
     build:
       context: .
-      dockerfile: src/backend/Dockerfile.dev
-    container_name: backend
+      dockerfile: src/backend/Dockerfile.prod
+    container_name: backend-prod
     environment:
-      ASPNETCORE_ENVIRONMENT: Development
-      ASPNETCORE_URLS: http://+:5000
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
       POSTGRES_USER: appuser
       POSTGRES_PASSWORD: P@ssw0rd123!
-      ConnectionStrings__DefaultConnection: Host=postgres;Port=5432;Database=appdb;Username=appuser;Password=P@ssw0rd123!
-    volumes:
-      - ./src/backend:/src/backend  # Mount source code for hot-reload
     depends_on:
       postgres:
         condition: service_healthy
     networks:
       - app-network
       - monitoring
-    ports:
-      - "5000:5000"  # Development port
     labels:
       - "prometheus.io/scrape=true"
-      - "prometheus.io/port=5000"
+      - "prometheus.io/port=8080"
       - "prometheus.io/path=/metrics"
     restart: unless-stopped
 
@@ -68,7 +61,7 @@ services:
     build:
       context: .
       dockerfile: src/frontend/Dockerfile
-    container_name: nginx
+    container_name: nginx-prod
     ports:
       - "80:80"
     depends_on:
@@ -81,7 +74,7 @@ services:
   # Monitoring Stack
   prometheus:
     image: prom/prometheus:v2.52.0
-    container_name: prometheus
+    container_name: prometheus-prod
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
@@ -100,7 +93,7 @@ services:
 
   grafana:
     image: grafana/grafana:10.4.0
-    container_name: grafana
+    container_name: grafana-prod
     environment:
       GF_SECURITY_ADMIN_USER: admin
       GF_SECURITY_ADMIN_PASSWORD: admin123
@@ -117,7 +110,7 @@ services:
 
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:v0.49.1
-    container_name: cadvisor
+    container_name: cadvisor-prod
     privileged: true
     devices:
       - /dev/kmsg:/dev/kmsg
@@ -135,7 +128,7 @@ services:
 
   node-exporter:
     image: prom/node-exporter:v1.8.1
-    container_name: node-exporter
+    container_name: node-exporter-prod
     command:
       - '--path.procfs=/host/proc'
       - '--path.rootfs=/rootfs'

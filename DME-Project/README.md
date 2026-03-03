@@ -102,5 +102,56 @@ cAdvisor Metrics
 Node Exporter Metrics
 ![Node Exporter Metrics](./Screenshots/node-exporter-metrics.png)
 
-## Contributing
-Contributions are welcome! Please open issues and submit pull requests for any improvements or bug fixes. 
+🚀 Development Commands
+Start development environment:
+
+bash
+cd /home/vivekbanka/Projects/DRM/DME-Project
+docker compose up -d --build
+View development logs:
+
+bash
+docker compose logs -f backend
+Stop development:
+
+bash
+docker compose down
+Access points:
+
+Backend API: http://localhost:5000
+Swagger UI: http://localhost:5000/swagger
+Health Check: http://localhost:5000/health
+🏭 Production Commands
+Start production environment:
+
+bash
+cd /home/vivekbanka/Projects/DRM/DME-Project
+docker compose -f docker-compose.prod.yml up -d --build
+View production logs:
+
+bash
+docker compose -f docker-compose.prod.yml logs -f backend
+Stop production:
+
+bash
+docker compose -f docker-compose.prod.yml down
+Access points:
+
+Backend API: http://localhost:8080
+Frontend (Nginx): http://localhost:80
+Health Check: http://localhost:8080/health
+🔄 Quick Switch
+From dev to prod:
+
+bash
+docker compose down
+docker compose -f docker-compose.prod.yml up -d --build
+From prod to dev:
+
+bash
+docker compose -f docker-compose.prod.yml down
+docker compose up -d --build
+
+
+
+
