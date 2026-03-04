@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { useAuth } from '../contexts/AuthContext';
-import { getItems, createItem } from '../api';
+import { fetchItems, addItem, selectItems, selectItemsLoading } from '../store/slices/itemsSlice';
 import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
 import { DataTable } from 'primereact/datatable';
@@ -10,39 +11,28 @@ import { Dialog } from 'primereact/dialog';
 import 'primeflex/primeflex.css'
 
 const Dashboard = ({ adminView = false }) => {
-  const [items, setItems] = useState([]);
   const [name, setName] = useState('');
   const [value, setValue] = useState('');
   const [showDialog, setShowDialog] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const { user, logout, hasRole } = useAuth();
+  const dispatch = useDispatch();
+  const items = useSelector(selectItems);
+  const loading = useSelector(selectItemsLoading);
+  const { user, hasRole } = useAuth();
 
   useEffect(() => {
-    loadItems();
-  }, []);
-
-  const loadItems = async () => {
-    try {
-      const data = await getItems();
-      setItems(data);
-    } catch (err) {
-      console.error('Failed to load items');
-    }
-  };
+    dispatch(fetchItems());
+  }, [dispatch]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     try {
-      await createItem({ name, value: parseInt(value) });
+      await dispatch(addItem({ name, value: parseInt(value) })).unwrap();
       setName('');
       setValue('');
       setShowDialog(false);
-      loadItems();
     } catch (err) {
       console.error('Failed to create item');
     }
-    setLoading(false);
   };
 
 

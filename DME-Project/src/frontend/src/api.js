@@ -34,3 +34,10 @@ export const updateRole = async (roleId, roleName, roleDescription, rolesIsActiv
   const { data } = await axios.put(`${API_BASE}/roles/${roleId}`, { roleName, roleDescription, rolesIsActive });
   return data;
 }
+
+export const deleteRole = async (roleId) => {
+  const { data } = await axios.delete(`${API_BASE}/roles/${roleId}`);
+  return data;
+}
+
+

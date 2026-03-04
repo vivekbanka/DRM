@@ -1,48 +1,81 @@
 import React, { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Card } from 'primereact/card';
 import { Button } from 'primereact/button';
-import { getRoles } from '../api';
+import { fetchRoles, addRole, editRole, removeRole, selectRoles, selectRolesLoading, selectSelectedRole, selectIsEditing, setSelectedRole, setEditing, clearSelectedRole } from '../store/slices/rolesSlice';
 import { Dialog } from 'primereact/dialog';
-import 'primeflex/primeflex.css'
 import { InputText } from 'primereact/inputtext';
-import { createRole } from '../api';
+import 'primeflex/primeflex.css'
 
 function Roles() {
     const [showDialog, setShowDialog] = useState(false);
-    const [loading, setLoading] = useState(false);
-    const [roles, setRoles] = useState([]);
     const [roleName, setRoleName] = useState('');
     const [roleDescription, setRoleDescription] = useState('');
+    const dispatch = useDispatch();
+    const roles = useSelector(selectRoles);
+    const loading = useSelector(selectRolesLoading);
+    const selectedRole = useSelector(selectSelectedRole);
+    const isEditing = useSelector(selectIsEditing);
 
     useEffect(() => {
-        loadRoles();
-    }, []);
+        dispatch(fetchRoles());
+    }, [dispatch]); 
 
-    const loadRoles = async () => {
-        try {
-            const data = await getRoles();
-            setRoles(data);
-        } catch (err) {
-            console.error('Failed to load roles');
-        }
-    }; 
-
-      const handleSubmit = async (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        setLoading(true);
         try {
-          await createRole({ roleName: roleName, roleDescription: roleDescription, rolesIsActive: true });
+          if (isEditing && selectedRole) {
+            await dispatch(editRole({ 
+              id: selectedRole.id, 
+              roleData: { roleName, roleDescription, rolesIsActive: true } 
+            })).unwrap();
+          } else {
+            await dispatch(addRole({ roleName, roleDescription, rolesIsActive: true })).unwrap();
+          }
           setRoleName('');
           setRoleDescription('');
           setShowDialog(false);
-          loadRoles();
+          dispatch(clearSelectedRole());
         } catch (err) {
-          console.error('Failed to create role');
+          console.error('Failed to save role');
         }
-        setLoading(false);
       };
+
+      const handleEdit = (role) => {
+        dispatch(setSelectedRole(role));
+        setRoleName(role.roleName);
+        setRoleDescription(role.roleDescription);
+        dispatch(setEditing(true));
+        setShowDialog(true);
+      };
+
+      const handleDelete = async (role) => {
+        if (window.confirm(`Are you sure you want to delete ${role.roleName}?`)) {
+          try {
+            await dispatch(removeRole(role.id)).unwrap();
+          } catch (err) {
+            console.error('Failed to delete role');
+          }
+        }
+      };
+
+      const handleAddNew = () => {
+        dispatch(clearSelectedRole());
+        setRoleName('');
+        setRoleDescription('');
+        dispatch(setEditing(false));
+        setShowDialog(true);
+      };
+
+      const handleDialogHide = () => {
+        setShowDialog(false);
+        dispatch(clearSelectedRole());
+        setRoleName('');
+        setRoleDescription('');
+      };
+
     return (
       <>
         <Card title="Roles">
@@ -51,9 +84,9 @@ function Roles() {
               <h2>Manage System Roles</h2>
             </div>
             <Button
-              label="Add Roles"
+              label="Add Role"
               icon="pi pi-plus"
-              onClick={() => setShowDialog(true)}
+              onClick={handleAddNew}
             />
           </div>
 
@@ -61,12 +94,31 @@ function Roles() {
             <Column field="roleName" header="Role Name" />
             <Column field="roleDescription" header="Description" />
             <Column field="rolesIsActive" header="Active" />
+            <Column 
+              header="Actions" 
+              body={(rowData) => (
+                <div className="flex gap-2">
+                  <Button 
+                    icon="pi pi-pencil" 
+                    className="p-button-text p-button-info" 
+                    onClick={() => handleEdit(rowData)}
+                    tooltip="Edit Role"
+                  />
+                  <Button 
+                    icon="pi pi-trash" 
+                    className="p-button-text p-button-danger" 
+                    onClick={() => handleDelete(rowData)}
+                    tooltip="Delete Role"
+                  />
+                </div>
+              )}
+            />
           </DataTable>
         </Card>
             <Dialog
-                header="Add New Role"
+                header={isEditing ? "Edit Role" : "Add New Role"}
                 visible={showDialog}
-                onHide={() => setShowDialog(false)}
+                onHide={handleDialogHide}
                 className="w-full md:w-6 lg:w-4"
               >
                 <form onSubmit={handleSubmit} className="p-fluid">
@@ -92,7 +144,7 @@ function Roles() {
         
                   <Button
                     type="submit"
-                    label="Add Role"
+                    label={isEditing ? "Update Role" : "Add Role"}
                     loading={loading}
                     className="w-full"
                   />

@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { login, register, getCurrentUser } from '../api/auth';
+import React, { createContext, useContext, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { loginUser, registerUser, logoutUser, initializeAuth, selectAuth, selectAuthLoading } from '../store/slices/authSlice';
 
 const AuthContext = createContext();
 
@@ -12,76 +13,63 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [token, setToken] = useState(localStorage.getItem('token'));
+  const dispatch = useDispatch();
+  const auth = useSelector(selectAuth);
+  const loading = useSelector(selectAuthLoading);
 
   useEffect(() => {
-    const initAuth = async () => {
-      const storedToken = localStorage.getItem('token');
-      if (storedToken) {
-        try {
-          const userData = await getCurrentUser();
-          setUser(userData);
-          setToken(storedToken);
-        } catch (error) {
-          localStorage.removeItem('token');
-          setToken(null);
-        }
-      }
-      setLoading(false);
-    };
-
-    initAuth();
-  }, []);
+    dispatch(initializeAuth());
+  }, [dispatch]);
 
   const handleLogin = async (email, password) => {
     try {
-      const response = await login(email, password);
-      localStorage.setItem('token', response.token);
-      setToken(response.token);
-      setUser(response.user);
+      const result = await dispatch(loginUser({ email, password })).unwrap();
       return { success: true };
     } catch (error) {
       return { 
         success: false, 
-        message: error.response?.data?.message || 'Login failed' 
+        message: error 
       };
     }
   };
 
   const handleRegister = async (email, password, firstName, lastName) => {
     try {
-      await register(email, password, firstName, lastName);
+      await dispatch(registerUser({ firstName, lastName, email, password })).unwrap();
       return { success: true };
     } catch (error) {
       return { 
         success: false, 
-        message: error.response?.data?.message || 'Registration failed' 
+        message: error 
       };
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    setToken(null);
-    setUser(null);
-    return { success: true };
+  const handleLogout = async () => {
+    try {
+      await dispatch(logoutUser()).unwrap();
+      return { success: true };
+    } catch (error) {
+      return { 
+        success: false, 
+        message: error 
+      };
+    }
   };
 
   const hasRole = (role) => {
-    return user?.roles?.includes(role) || false;
+    return auth.user?.roles?.includes(role) || false;
   };
 
   const value = {
-    user,
-    token,
+    user: auth.user,
+    token: auth.token,
     loading,
     login: handleLogin,
     register: handleRegister,
     logout: handleLogout,
     hasRole,
-    isAuthenticated: !!user
+    isAuthenticated: auth.isAuthenticated
   };
 
   return (
