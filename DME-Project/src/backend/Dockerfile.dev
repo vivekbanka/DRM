@@ -11,6 +11,9 @@ RUN apt-get update && apt-get install -y \
     curl \
  && rm -rf /var/lib/apt/lists/*
 
+# Copy project files
+COPY . .
+
 EXPOSE 5000
 
 ENV ASPNETCORE_ENVIRONMENT=Development
@@ -22,4 +25,4 @@ ENV DOTNET_WATCH_RESTART_ON_RUDE_EDIT=true
 RUN dotnet restore ./Backend.csproj
 
 # Run with hot reload
-CMD ["dotnet", "watch", "run", "--urls", "http://0.0.0.0:5000"]
+CMD ["dotnet", "watch", "run", "--project", "./Backend.csproj", "--urls", "http://0.0.0.0:5000"]

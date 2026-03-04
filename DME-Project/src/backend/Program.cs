@@ -8,6 +8,7 @@ using System.Text;
 using Serilog;
 using Prometheus;
 using Microsoft.OpenApi.Models;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
@@ -68,7 +69,10 @@ builder.Services.AddSwaggerGen(c =>
     }
 });
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+{
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
+           .ConfigureWarnings(w => w.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning));
+});
 builder.Services.AddHealthChecks()
     .AddNpgSql(builder.Configuration.GetConnectionString("DefaultConnection")!);
 builder.Services.AddCors();
@@ -137,29 +141,41 @@ if (app.Environment.IsDevelopment())
 
 app.MapControllers();
 
-// Seed data
-using (var scope = app.Services.CreateScope())
-{
-    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+// // Seed data
+// using (var scope = app.Services.CreateScope())
+// {
+//     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     
-    try
-    {
-        // Apply any pending migrations
-        db.Database.Migrate();
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"Migration error: {ex.Message}");
-        // If migrations fail, try to ensure created
-        try
-        {
-            db.Database.EnsureCreated();
-        }
-        catch (Exception createEx)
-        {
-            Console.WriteLine($"Database creation error: {createEx.Message}");
-        }
-    }
-}
+//     try
+//     {
+//         // Check if database tables exist, if not create them
+//         if (!db.Database.CanConnect())
+//         {
+//             db.Database.EnsureCreated();
+//         }
+//         else
+//         {
+//             // Try applying migrations, but don't fail if tables exist
+//             try
+//             {
+//                 db.Database.Migrate();
+//             }
+//             catch (Exception migrateEx)
+//             {
+//                 // If migration fails due to existing tables, ignore
+//                 if (!migrateEx.Message.Contains("already exists"))
+//                 {
+//                     throw;
+//                 }
+//                 Console.WriteLine($"Skipping migration (tables already exist): {migrateEx.Message}");
+//             }
+//         }
+//     }
+//     catch (Exception ex)
+//     {
+//         Console.WriteLine($"Database error: {ex.Message}");
+//         throw;
+//     }
+// }
 
 app.Run();
