@@ -63,17 +63,19 @@ services:
       - "prometheus.io/path=/metrics"
     restart: unless-stopped
 
-  # Frontend (Nginx)
-  nginx:
+  # Frontend (Development)
+  frontend:
     build:
       context: .
-      dockerfile: src/frontend/Dockerfile
-    container_name: nginx
+      dockerfile: src/frontend/Dockerfile.dev
+    container_name: frontend
+    environment:
+      NODE_ENV: development
+    volumes:
+      - ./src/frontend:/app  # Mount source code for hot-reload
+      - /app/node_modules  # Prevent host node_modules from overwriting container's
     ports:
-      - "80:80"
-    depends_on:
-      backend:
-        condition: service_healthy
+      - "3001:3000"  # Development port (3001 to avoid conflicts)
     networks:
       - app-network
     restart: unless-stopped

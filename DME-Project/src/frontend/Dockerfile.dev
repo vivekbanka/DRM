@@ -1,0 +1,29 @@
+# Development Dockerfile with hot-reload for React
+FROM node:20-alpine AS development
+
+# Install development dependencies
+RUN apk add --no-cache tini curl
+
+WORKDIR /app
+
+# Copy package files
+COPY src/frontend/package*.json ./
+
+# Install dependencies
+RUN npm install
+
+# Copy source code
+COPY src/frontend/ .
+
+# Expose port for development server
+EXPOSE 3000
+
+# Set environment for development
+ENV NODE_ENV=development
+
+# Health check for development
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:3000 || exit 1
+
+# Start development server with hot-reload
+ENTRYPOINT ["npm", "run", "dev"]

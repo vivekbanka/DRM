@@ -102,7 +102,19 @@ cAdvisor Metrics
 Node Exporter Metrics
 ![Node Exporter Metrics](./Screenshots/node-exporter-metrics.png)
 
-🚀 Development Commands
+## 🔄 Development vs Production API Configuration
+
+**Development (NODE_ENV=development):**
+- Frontend uses: `http://localhost:5000/api`
+- Backend runs on: `http://localhost:5000`
+- Frontend dev server: `http://localhost:3001`
+
+**Production (NODE_ENV=production):**
+- Frontend uses: `/api` (relative path)
+- Backend runs on: `http://localhost:8080`
+- Frontend served by: Nginx on `http://localhost:80`
+
+## 🚀 Development Commands
 Start development environment:
 
 bash
@@ -152,6 +164,19 @@ bash
 docker compose -f docker-compose.prod.yml down
 docker compose up -d --build
 
+# Start development (already running)
+docker compose up -d --build
+ 
+# Check status
+docker compose ps
+curl http://localhost:5000/health
+ 
+# View API
+curl http://localhost:5000/api/items
 
 
-
+API: http://localhost:5000
+Frontend (React Dev): http://localhost:3001
+Health: http://localhost:5000/health
+Swagger JSON: http://localhost:5000/swagger/v1/swagger.json
+Items API: http://localhost:5000/api/items

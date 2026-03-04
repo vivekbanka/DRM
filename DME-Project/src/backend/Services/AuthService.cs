@@ -55,16 +55,21 @@ public class AuthService : IAuthService
             PasswordHash = HashPassword(request.Password),
             FirstName = request.FirstName,
             LastName = request.LastName,
+            // CompanyId = 1, // Removed for now - will handle company creation separately
             IsActive = true
         };
 
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
 
+        // Get the user ID after saving
+        var savedUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == user.Email);
+        if (savedUser == null) return false;
+
         // Assign default User role
         var userRole = new UserRole
         {
-            UserId = user.Id,
+            UserId = savedUser.Id,
             RoleId = 2 // User role
         };
 

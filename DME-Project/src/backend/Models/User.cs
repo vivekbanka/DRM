@@ -43,11 +43,10 @@ public class User
     public string LastName { get; set; } = string.Empty;
     
     /// <summary>
-    /// Company identifier (scalar: integer)
+    /// Company identifier (scalar: integer, nullable for now)
     /// </summary>
     /// <example>1</example>
-    [Required]
-    public int CompanyId { get; set; }
+    public int? CompanyId { get; set; }
     
     /// <summary>
     /// Account creation timestamp (scalar: datetime)

@@ -37,7 +37,8 @@ public class AppDbContext : DbContext
         builder.Entity<User>()
             .HasOne<Company>()
             .WithMany()
-            .HasForeignKey(u => u.CompanyId);
+            .HasForeignKey(u => u.CompanyId)
+            .OnDelete(DeleteBehavior.SetNull); // Make relationship optional
 
         // Seed default roles
         builder.Entity<Role>().HasKey(r => r.Id);

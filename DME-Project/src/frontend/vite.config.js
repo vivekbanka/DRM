@@ -4,7 +4,11 @@ import compression from 'vite-plugin-compression';
 
 export default defineConfig({
   plugins: [react(), compression()],
-  server: { port: 3000, strictPort: true },
+  server: { 
+    port: 3000, 
+    strictPort: true,
+    host: true  // Allow external connections
+  },
   build: {
     outDir: 'dist',
     sourcemap: false,

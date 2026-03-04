@@ -113,7 +113,7 @@ var app = builder.Build();
 // Middleware
 app.UseSerilogRequestLogging();
 app.UseCors(policy => policy
-    .WithOrigins("http://localhost:3000", "http://nginx")
+    .WithOrigins("http://localhost:3000","http://localhost:3001", "http://nginx")
     .AllowAnyMethod()
     .AllowAnyHeader());
 
@@ -142,11 +142,24 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     
-    // Ensure database is created
-    db.Database.EnsureCreated();
-    
-    // Apply any pending migrations
-    db.Database.Migrate();
+    try
+    {
+        // Apply any pending migrations
+        db.Database.Migrate();
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Migration error: {ex.Message}");
+        // If migrations fail, try to ensure created
+        try
+        {
+            db.Database.EnsureCreated();
+        }
+        catch (Exception createEx)
+        {
+            Console.WriteLine($"Database creation error: {createEx.Message}");
+        }
+    }
 }
 
 app.Run();
