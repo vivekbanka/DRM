@@ -28,7 +28,7 @@ export const register = async (email, password, firstName, lastName) => {
     password,
     firstName,
     lastName,
-    companyId: 0
+    companyId: 1
   });
   return data;
 };

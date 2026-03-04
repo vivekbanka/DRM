@@ -6,6 +6,9 @@ import { Password } from 'primereact/password';
 import { Card } from 'primereact/card';
 import { Messages } from 'primereact/messages';
 import { useRef } from 'react';
+import { useNavigate } from "react-router-dom";
+import logo from "../assets/logo.png"
+
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -13,6 +16,7 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
   const messages = useRef(null);
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -24,6 +28,8 @@ const Login = () => {
       messages.current?.show([
         { severity: 'success', summary: 'Success', detail: 'Login successful!' }
       ]);
+      navigate('/dashboard')
+
     } else {
       messages.current?.show([
         { severity: 'error', summary: 'Error', detail: result.message }
@@ -33,9 +39,24 @@ const Login = () => {
     setIsLoading(false);
   };
 
+   const header = (
+    <div className="flex justify-content-center align-items-center">
+          <img 
+                      alt="Card" 
+                      src={logo}
+                      style={{ width: '100%', objectFit: 'cover' }} 
+                  />
+    </div>
+        
+    );
   return (
     <div className="flex justify-content-center align-items-center min-h-screen">
-      <Card title="Login" className="w-full md:w-6 lg:w-4">
+      <Card className="w-full md:w-6 lg:w-4" header={header}>
+        <div className='flex justify-content-center align-items-center'>
+          <h2 className="mb-4">Vcareservices</h2>
+         
+        </div>
+         <h2 className='text-center'>Login</h2>
         <form onSubmit={handleSubmit} className="p-fluid">
           <Messages ref={messages} />
           

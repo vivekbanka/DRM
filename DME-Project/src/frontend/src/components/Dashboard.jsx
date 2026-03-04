@@ -8,6 +8,7 @@ import { Column } from 'primereact/column';
 import { Card } from 'primereact/card';
 import { Menubar } from 'primereact/menubar';
 import { Dialog } from 'primereact/dialog';
+import 'primeflex/primeflex.css'
 
 const Dashboard = ({ adminView = false }) => {
   const [items, setItems] = useState([]);
@@ -30,6 +31,12 @@ const Dashboard = ({ adminView = false }) => {
     }
   };
 
+  const handleLogout = () => {  
+    var result = logout();
+    if(result.success) {
+      window.location.href = '/login';
+    }
+  }
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -51,13 +58,18 @@ const Dashboard = ({ adminView = false }) => {
       icon: 'pi pi-home',
       command: () => window.location.href = '/dashboard'
     },
+    {
+      
+    },
     ...(hasRole('Admin') ? [{
       label: 'Admin Panel',
       icon: 'pi pi-cog',
       command: () => window.location.href = '/admin'
     }] : []),
   ];
-  const end = (<Button label="Logout" icon="pi pi-sign-out" onClick={logout} />);
+  const end = (<> 
+    <Button label="Logout"  icon="pi pi-sign-out" onClick={handleLogout} />
+  </>);
 
   return (
     <div className="min-h-screen">
