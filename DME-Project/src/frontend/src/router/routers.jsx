@@ -3,18 +3,29 @@ import Register from '../components/Register';
 import Dashboard from '../components/Dashboard';
 import ProtectedRoute from '../components/ProtectedRoute';
 import Roles from '../components/Roles';
+import Layout from '../components/Layout';
 
 const router = [
     { path: '/login', element: <Login /> },
     { path: '/register', element: <Register /> },
-    { path: '/dashboard', element: <Dashboard /> },
+    { path: '/dashboard', element: (
+        <Layout>
+            <Dashboard />
+        </Layout>
+    )},
     { path: '/', element: <Login /> },
-    {path:'/roles', element:<Roles></Roles>},
+    {path:'/roles', element:(
+        <Layout>
+            <Roles></Roles>
+        </Layout>
+    )},
     {
         path: '/admin',
         element: (
             <ProtectedRoute requiredRole="Admin">
-                <Dashboard adminView />
+                <Layout>
+                    <Dashboard adminView />
+                </Layout>
             </ProtectedRoute>
         ),
     },

@@ -6,7 +6,6 @@ import { InputText } from 'primereact/inputtext';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Card } from 'primereact/card';
-import { Menubar } from 'primereact/menubar';
 import { Dialog } from 'primereact/dialog';
 import 'primeflex/primeflex.css'
 
@@ -31,12 +30,6 @@ const Dashboard = ({ adminView = false }) => {
     }
   };
 
-  const handleLogout = () => {  
-    var result = logout();
-    if(result.success) {
-      window.location.href = '/login';
-    }
-  }
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -52,31 +45,10 @@ const Dashboard = ({ adminView = false }) => {
     setLoading(false);
   };
 
-  const menuItems = [
-    {
-      label: 'Dashboard',
-      icon: 'pi pi-home',
-      command: () => window.location.href = '/dashboard'
-    },
-    {
-      
-    },
-    ...(hasRole('Admin') ? [{
-      label: 'Admin Panel',
-      icon: 'pi pi-cog',
-      command: () => window.location.href = '/admin'
-    }] : []),
-  ];
-  const end = (<> 
-    <Button label="Logout"  icon="pi pi-sign-out" onClick={handleLogout} />
-  </>);
 
   return (
-    <div className="min-h-screen">
-      <Menubar model={menuItems} className="mb-4" end={end} />
-      
-      <div className="p-4">
-        <Card title={`${adminView ? 'Admin' : 'User'} Dashboard`}>
+    <>
+      <Card title={`${adminView ? 'Admin' : 'User'} Dashboard`}>
           <div className="flex justify-content-between align-items-center mb-4">
             <div>
               <h2>Welcome, {user?.firstName} {user?.lastName}!</h2>
@@ -97,8 +69,7 @@ const Dashboard = ({ adminView = false }) => {
             <Column field="name" header="Name" />
             <Column field="value" header="Value" />
           </DataTable>
-        </Card>
-      </div>
+      </Card>
 
       <Dialog
         header="Add New Item"
@@ -136,7 +107,7 @@ const Dashboard = ({ adminView = false }) => {
           />
         </form>
       </Dialog>
-    </div>
+    </>
   );
 };
 

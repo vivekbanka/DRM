@@ -14,3 +14,18 @@ export const createItem = async (item) => {
   const { data } = await axios.post(`${API_BASE}/items`, item);
   return data;
 };
+
+export const getRoles = async () => {
+  const { data } = await axios.get(`${API_BASE}/roles`);
+  return data;
+};
+
+export const createRole = async (roleName, roleDescription,rolesIsActive) => {
+  const { data } = await axios.post(`${API_BASE}/roles`, { roleName, roleDescription, rolesIsActive });
+  return data;
+}
+
+export const updateRole = async (roleId, roleName, roleDescription, rolesIsActive) => {
+  const { data } = await axios.put(`${API_BASE}/roles/${roleId}`, { roleName, roleDescription, rolesIsActive });
+  return data;
+}
