@@ -56,16 +56,12 @@ const Dashboard = ({ adminView = false }) => {
       icon: 'pi pi-cog',
       command: () => window.location.href = '/admin'
     }] : []),
-    {
-      label: 'Logout',
-      icon: 'pi pi-sign-out',
-      command: logout
-    }
   ];
+  const end = (<Button label="Logout" icon="pi pi-sign-out" onClick={logout} />);
 
   return (
     <div className="min-h-screen">
-      <Menubar model={menuItems} className="mb-4" />
+      <Menubar model={menuItems} className="mb-4" end={end} />
       
       <div className="p-4">
         <Card title={`${adminView ? 'Admin' : 'User'} Dashboard`}>
