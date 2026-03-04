@@ -1,37 +1,25 @@
-# Development Dockerfile with hot-reload
-FROM mcr.microsoft.com/dotnet/sdk:10.0-alpine AS build
+# src/backend/Dockerfile.dev
+FROM mcr.microsoft.com/dotnet/sdk:10.0
 
 WORKDIR /src/backend
 
-# Copy csproj and restore
-COPY src/backend/Backend.csproj ./
-RUN dotnet restore ./Backend.csproj
+# Install dependencies
+RUN apt-get update && apt-get install -y \
+    tzdata \
+    krb5-user \
+    bash \
+    curl \
+ && rm -rf /var/lib/apt/lists/*
 
-# Copy source code and build
-COPY src/backend/ .
-RUN dotnet build -c Debug -o ./app
-
-# Runtime stage
-FROM mcr.microsoft.com/dotnet/aspnet:10.0-alpine AS development
-
-# Install development dependencies
-RUN apk add --no-cache ca-certificates tzdata && update-ca-certificates
-
-WORKDIR /app
-
-# Copy built application
-COPY --from=build /src/backend/app ./
-
-# Expose port for development
 EXPOSE 5000
 
-# Set environment for development
 ENV ASPNETCORE_ENVIRONMENT=Development
-ENV ASPNETCORE_URLS=http://+:5000
+ENV ASPNETCORE_URLS=http://0.0.0.0:5000
+ENV DOTNET_USE_POLLING_FILE_WATCHER=1
+ENV DOTNET_WATCH_RESTART_ON_RUDE_EDIT=true
 
-# Health check for development
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD wget --no-verbose --tries=1 --spider http://localhost:5000/health || exit 1
+# Restore NuGet packages
+RUN dotnet restore ./Backend.csproj
 
-# Run the application
-ENTRYPOINT ["dotnet", "Backend.dll", "--urls", "http://0.0.0.0:5000"]
+# Run with hot reload
+CMD ["dotnet", "watch", "run", "--urls", "http://0.0.0.0:5000"]

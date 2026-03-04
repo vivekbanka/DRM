@@ -55,7 +55,7 @@ public class AuthService : IAuthService
             PasswordHash = HashPassword(request.Password),
             FirstName = request.FirstName,
             LastName = request.LastName,
-            // CompanyId = 1, // Removed for now - will handle company creation separately
+            CompanyId = request.CompanyId,
             IsActive = true
         };
 

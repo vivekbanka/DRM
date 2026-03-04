@@ -17,4 +17,7 @@ public class RegisterRequest
     
     [Required]
     public string LastName { get; set; } = string.Empty;
+
+    [Required]
+    public int CompanyId { get; set; }
 }

@@ -11,9 +11,8 @@ volumes:
   prometheus_data: {}
   grafana_data: {}
 
-# PostgreSQL
-
-services: 
+services:
+  # PostgreSQL
   postgres:
     image: postgres:16-alpine
     container_name: postgres
@@ -48,7 +47,7 @@ services:
       POSTGRES_PASSWORD: P@ssw0rd123!
       ConnectionStrings__DefaultConnection: Host=postgres;Port=5432;Database=appdb;Username=appuser;Password=P@ssw0rd123!
     volumes:
-      - ./src/backend:/src/backend  # Mount source code for hot-reload
+      - ./src/backend:/src/backend
     depends_on:
       postgres:
         condition: service_healthy
@@ -56,7 +55,7 @@ services:
       - app-network
       - monitoring
     ports:
-      - "5000:5000"  # Development port
+      - "5000:5000"
     labels:
       - "prometheus.io/scrape=true"
       - "prometheus.io/port=5000"
@@ -72,15 +71,15 @@ services:
     environment:
       NODE_ENV: development
     volumes:
-      - ./src/frontend:/app  # Mount source code for hot-reload
-      - /app/node_modules  # Prevent host node_modules from overwriting container's
+      - ./src/frontend:/app
+      - /app/node_modules
     ports:
-      - "3001:3000"  # Development port (3001 to avoid conflicts)
+      - "3001:3000"
     networks:
       - app-network
     restart: unless-stopped
 
-  # Monitoring Stack
+  # Prometheus
   prometheus:
     image: prom/prometheus:v2.52.0
     container_name: prometheus
@@ -100,6 +99,7 @@ services:
       - monitoring
     restart: unless-stopped
 
+  # Grafana
   grafana:
     image: grafana/grafana:10.4.0
     container_name: grafana
@@ -117,6 +117,7 @@ services:
       - monitoring
     restart: unless-stopped
 
+  # cAdvisor
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:v0.49.1
     container_name: cadvisor
@@ -135,6 +136,7 @@ services:
       - monitoring
     restart: unless-stopped
 
+  # Node Exporter
   node-exporter:
     image: prom/node-exporter:v1.8.1
     container_name: node-exporter
