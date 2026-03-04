@@ -20,8 +20,13 @@ export const getRoles = async () => {
   return data;
 };
 
-export const createRole = async (roleName, roleDescription,rolesIsActive) => {
-  const { data } = await axios.post(`${API_BASE}/roles`, { roleName, roleDescription, rolesIsActive });
+export const createRole = async (roleData) => {
+  var roleData = {
+    roleName: roleData.roleName,
+    roleDescription: roleData.roleDescription,
+    rolesIsActive: roleData.rolesIsActive
+  }
+  const { data } = await axios.post(`${API_BASE}/roles`, roleData);
   return data;
 }
 

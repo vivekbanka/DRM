@@ -107,6 +107,7 @@ builder.Services.AddAuthorization();
 
 // Custom services
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddTransient<IRolesService, RolesService>();
 
 // Logging
 builder.Host.UseSerilog((context, config) => 
