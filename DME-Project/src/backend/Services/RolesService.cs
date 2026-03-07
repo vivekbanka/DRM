@@ -23,7 +23,8 @@ public class RolesService : IRolesService
         {
             RoleName = r.Name,
             RoleDescription = r.Description,
-            RolesIsActive = r.IsActive
+            RolesIsActive = r.IsActive,
+            RoleID = r.Id
         }).ToList();
     }
 
@@ -36,7 +37,8 @@ public class RolesService : IRolesService
         {
             RoleName = role.Name,
             RoleDescription = role.Description,
-            RolesIsActive = role.IsActive
+            RolesIsActive = role.IsActive,
+            RoleID = role.Id
         };
     }
 

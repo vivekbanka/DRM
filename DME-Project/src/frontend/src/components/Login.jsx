@@ -23,7 +23,6 @@ const Login = () => {
     setIsLoading(true);
 
     const result = await login(email, password);
-    
     if (result.success) {
       messages.current?.show([
         { severity: 'success', summary: 'Success', detail: 'Login successful!' }

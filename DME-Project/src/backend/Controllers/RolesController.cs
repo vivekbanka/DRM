@@ -7,6 +7,7 @@ namespace Backend.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class RolesController : ControllerBase
 {
     private readonly IRolesService _rolesService;

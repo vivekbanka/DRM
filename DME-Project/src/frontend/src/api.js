@@ -5,39 +5,71 @@ const API_BASE = process.env.NODE_ENV === 'development'
   ? 'http://localhost:5000/api' 
   : '/api';
 
+// Create axios instance with default configuration
+const api = axios.create({
+  baseURL: API_BASE,
+});
+
+// Request interceptor to add JWT token to all requests
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Response interceptor to handle token expiration
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // Token expired or invalid, clear storage and redirect to login
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
+
 export const getItems = async () => {
-  const { data } = await axios.get(`${API_BASE}/items`);
+  const { data } = await api.get('/items');
   return data;
 };
 
 export const createItem = async (item) => {
-  const { data } = await axios.post(`${API_BASE}/items`, item);
+  const { data } = await api.post('/items', item);
   return data;
 };
 
 export const getRoles = async () => {
-  const { data } = await axios.get(`${API_BASE}/roles`);
+  const { data } = await api.get('/roles');
   return data;
 };
 
 export const createRole = async (roleData) => {
-  var roleData = {
+  const { data } = await api.post('/roles', {
     roleName: roleData.roleName,
     roleDescription: roleData.roleDescription,
     rolesIsActive: roleData.rolesIsActive
-  }
-  const { data } = await axios.post(`${API_BASE}/roles`, roleData);
+  });
   return data;
-}
+};
 
-export const updateRole = async (roleId, roleName, roleDescription, rolesIsActive) => {
-  const { data } = await axios.put(`${API_BASE}/roles/${roleId}`, { roleName, roleDescription, rolesIsActive });
+export const updateRole = async (roleId, roleData) => {
+  const { data } = await api.put(`/roles/${roleId}`, roleData);
   return data;
-}
+};
 
 export const deleteRole = async (roleId) => {
-  const { data } = await axios.delete(`${API_BASE}/roles/${roleId}`);
+  const { data } = await api.delete(`/roles/${roleId}`);
   return data;
-}
+};
 
 

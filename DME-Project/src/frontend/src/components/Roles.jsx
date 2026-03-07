@@ -28,7 +28,7 @@ function Roles() {
         try {
           if (isEditing && selectedRole) {
             await dispatch(editRole({ 
-              id: selectedRole.id, 
+              id: selectedRole.roleID, 
               roleData: { roleName, roleDescription, rolesIsActive: true } 
             })).unwrap();
           } else {

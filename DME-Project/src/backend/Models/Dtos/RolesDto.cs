@@ -10,4 +10,6 @@ public class RolesDto
 
     [Required]
     public bool RolesIsActive { get; set; }  
+
+    public int? RoleID { get; set; }
 }

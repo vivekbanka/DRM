@@ -26,6 +26,7 @@ export const AuthProvider = ({ children }) => {
       const result = await dispatch(loginUser({ email, password })).unwrap();
       return { success: true };
     } catch (error) {
+      console.error('Login error:', error);
       return { 
         success: false, 
         message: error 
