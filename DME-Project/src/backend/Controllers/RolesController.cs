@@ -40,10 +40,10 @@ public class RolesController : ControllerBase
     {
         var result = await _rolesService.CreateRoleAsync(roleDto);
         
-        if (!result)
+        if (result == null)
             return BadRequest(new { message = "Failed to create role" });
 
-        return Ok(new { message = "Role created successfully" });
+        return Ok(result);
     }
 
     [HttpPut("{id}")]
@@ -51,10 +51,10 @@ public class RolesController : ControllerBase
     {
         var result = await _rolesService.UpdateRoleAsync(id, roleDto);
         
-        if (!result)
+        if (result == null)
             return BadRequest(new { message = "Failed to update role" });
 
-        return Ok(new { message = "Role updated successfully" });
+        return Ok(result);
     }
 
     [HttpDelete("{id}")]

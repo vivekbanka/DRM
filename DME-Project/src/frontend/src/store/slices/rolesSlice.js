@@ -30,9 +30,8 @@ export const editRole = createAsyncThunk(
   'roles/editRole',
   async ({ id, roleData }, { rejectWithValue }) => {
     try {
-      console.log('Updating role with ID:', id, 'and data:', roleData);
       const response = await updateRole(id, {...roleData});
-      return { id, updatedRole: response };
+      return { id, updatedRole: {...roleData} };
     } catch (error) {
       return rejectWithValue(error.message || 'Failed to update role');
     }
@@ -78,6 +77,13 @@ const rolesSlice = createSlice({
       state.selectedRole = null;
       state.isEditing = false;
     },
+    addRoleToState: (state, action) => {
+      // This is handled by the addRole.fulfilled reducer
+    },
+    updateRoleInState: (state, action) => {
+      // This is handled by the editRole.fulfilled reducer
+    },
+  
   },
   extraReducers: (builder) => {
     builder
@@ -117,9 +123,13 @@ const rolesSlice = createSlice({
       .addCase(editRole.fulfilled, (state, action) => {
         state.isLoading = false;
         const { id, updatedRole } = action.payload;
-        const index = state.roles.findIndex(role => role.id === id);
+        // Try both id and roleID to handle different data structures
+        const index = state.roles.findIndex(role => 
+          role.id === id || role.roleID === id
+        );
         if (index !== -1) {
-          state.roles[index] = updatedRole;
+          // Merge the updated role with the existing role to preserve all properties
+          state.roles[index] = { ...state.roles[index], ...updatedRole };
         }
         state.selectedRole = null;
         state.isEditing = false;
@@ -136,7 +146,10 @@ const rolesSlice = createSlice({
       })
       .addCase(removeRole.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.roles = state.roles.filter(role => role.id !== action.payload);
+        // Try both id and roleID to handle different data structures
+        state.roles = state.roles.filter(role => 
+          role.id !== action.payload && role.roleID !== action.payload
+        );
         state.error = null;
       })
       .addCase(removeRole.rejected, (state, action) => {
@@ -150,7 +163,7 @@ export const {
   clearError, 
   setSelectedRole, 
   setEditing, 
-  clearSelectedRole 
+  clearSelectedRole
 } = rolesSlice.actions;
 
 // Selectors

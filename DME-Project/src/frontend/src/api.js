@@ -59,6 +59,7 @@ export const createRole = async (roleData) => {
     roleDescription: roleData.roleDescription,
     rolesIsActive: roleData.rolesIsActive
   });
+  console.log('API response from createRole:', data);
   return data;
 };
 

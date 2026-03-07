@@ -1,8 +1,9 @@
-using System.Security.Claims;
-using System.Text;
 using Backend.Data;
 using Backend.Models;
 using Backend.Models.Dtos;
+using System.Data;
+using System.Security.Claims;
+using System.Text;
 
 namespace Backend.Services;
 
@@ -19,7 +20,7 @@ public class RolesService : IRolesService
 
     public async Task<IEnumerable<RolesDto>> GetAllRolesAsync()
     {
-        return _context.Roles.Select(r => new RolesDto
+        return _context.Roles.Where(w => w.IsActive).Select(r => new RolesDto
         {
             RoleName = r.Name,
             RoleDescription = r.Description,
@@ -42,7 +43,7 @@ public class RolesService : IRolesService
         };
     }
 
-    public async Task<bool> CreateRoleAsync(RolesDto roleDto)
+    public async Task<RolesDto> CreateRoleAsync(RolesDto roleDto)
     {
         var role = new Role
         {
@@ -52,28 +53,45 @@ public class RolesService : IRolesService
         };
 
         _context.Roles.Add(role);
-        return await _context.SaveChangesAsync() > 0;
+        await _context.SaveChangesAsync();
+        var res =  new RolesDto
+        {
+            RoleName = role.Name,
+            RoleDescription = role.Description,
+            RolesIsActive = role.IsActive,
+            RoleID = role.Id
+        } ;
+
+        return res;
     }
 
-    public async Task<bool> UpdateRoleAsync(int roleId, RolesDto roleDto)
+    public async Task<RolesDto> UpdateRoleAsync(int roleId, RolesDto roleDto)
     {
         var existingRole = await _context.Roles.FindAsync(roleId);
-        if (existingRole == null) return false;
+        if (existingRole == null) return null;
 
         existingRole.Name = roleDto.RoleName;
         existingRole.Description = roleDto.RoleDescription;
         existingRole.IsActive = roleDto.RolesIsActive;
+        existingRole.UpdatedAt = DateTime.UtcNow;
 
         _context.Roles.Update(existingRole);
-        return await _context.SaveChangesAsync() > 0;
+        var res = new RolesDto
+        {
+            RoleName = existingRole.Name,
+            RoleDescription = existingRole.Description,
+            RolesIsActive = existingRole.IsActive,
+            RoleID = existingRole.Id
+        } ;
+        return res;
     }
 
     public async Task<bool> DeleteRoleAsync(int roleId)
     {
         var existingRole = await _context.Roles.FindAsync(roleId);
         if (existingRole == null) return false;
-
-        _context.Roles.Remove(existingRole);
+        existingRole.IsActive = false;
+        _context.Roles.Update(existingRole);
         return await _context.SaveChangesAsync() > 0;
     }
 }
